@@ -1,5 +1,5 @@
 import React from "react";
-import { TouchableOpacity, Text } from "react-native";
+import { TouchableOpacity, Text, ActivityIndicator } from "react-native";
 import { Colors } from "@/constants/themes";
 // !TEST
 import { IsDark } from "@/constants/tempThemeSelector";
@@ -13,20 +13,20 @@ const Button = ({
 }: any) => {
   const getBackgroundColor = () => {
     if (disabled) return variant === "primary" ? "#d7fabd" : "#e5e7eb";
-    return variant === "primary" ? Colors.light.mainColor2 : "transparent";
+    return variant === "primary" ? Colors.light.mainColorGreen : "transparent";
   };
 
   const getTextColor = () => {
     if (disabled) return variant === "primary" ? "#ffffff" : "#9ca3af";
-    return variant === "primary" ? "#ffffff" : Colors.light.mainColor2;
+    return variant === "primary" ? "#ffffff" : Colors.light.mainColorGreen;
   };
 
   const getBorderColor = () => {
     if (disabled) return variant === "primary" ? "#b9e995" : "#d1d5db";
     return variant === "primary"
       ? IsDark
-        ? Colors.dark.borderBottomColor2
-        : Colors.light.borderBottomColor2
+        ? Colors.dark.borderBottomColorGreen
+        : Colors.light.borderBottomColorGreen
       : IsDark
         ? "#374151"
         : "#e5e7eb";
@@ -58,6 +58,7 @@ const Button = ({
       }}
     >
       {Icon && <Icon size={20} color={getTextColor()} />}
+      {/* <ActivityIndicator color="#fff" size="small" /> */}
       <Text style={{ fontWeight: "900", fontSize: 18, color: getTextColor() }}>
         {children}
       </Text>

@@ -1,16 +1,19 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
-import { ArrowLeft, LogIn, Mail, Lock } from "lucide-react-native";
+import { router } from "expo-router";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+// Icons
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { ArrowLeft, LogIn, Mail, Lock } from "lucide-react-native";
 // Components
 import InputField from "@/components/InputField";
 import Button from "@/components/Button";
-// Styles
-import { styles } from "@/assets/stylesheets/loginStyles";
-import { router } from "expo-router";
+// Stylesheets
+import { authStyles } from "@/assets/stylesheets/authStyles";
 // Constants
 import { Colors } from "@/constants/themes";
+// services/api
+import { authApi } from "@/src/services/api/endpoints/auth";
 // !TEST
 import { IsDark } from "@/constants/tempThemeSelector";
 
@@ -18,34 +21,60 @@ const Login = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
+  // Requests
+  const loginRequest = async () => {
+    try {
+      const response = await authApi.login(email, password);
+      if (
+        response.data.accessToken &&
+        response.data.refreshToken &&
+        response.status === 200
+      )
+        Alert.alert("Alert Title", "Giriş başarılı", [
+          { text: "OK", onPress: () => router.replace("/(tabs)") },
+        ]);
+      else
+        Alert.alert("Hata", "Bilinmeyen bir hata oluştu", [
+          { text: "OK", onPress: () => null },
+        ]);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <SafeAreaView
       style={[
-        styles.safeAreaView,
-        { backgroundColor: IsDark ? "#111827" : "#ffffff" },
+        authStyles.safeAreaView,
+        {
+          backgroundColor: IsDark
+            ? Colors.dark.background
+            : Colors.light.background,
+        },
       ]}
     >
-      {/* Top */}
-      <View style={styles.topContainer}>
-        <TouchableOpacity onPress={() => router.replace("/(auth)/welcome")}>
-          <ArrowLeft size={32} color={Colors.light.mainColor2} />
-        </TouchableOpacity>
+      {/* Back */}
+      <TouchableOpacity onPress={() => router.replace("/(auth)/welcome")}>
+        <ArrowLeft size={32} color="#9ca3af" />
+      </TouchableOpacity>
 
-        <View style={{ marginTop: 32 }}>
+      {/* Top */}
+      <View style={authStyles.topContainer}>
+        <View>
           <View style={{ flexDirection: "row", gap: 16 }}>
             {/*  { backgroundColor: IsDark ? "#10b9811a" : "#ecfdf5" }, */}
             <View
               style={[
-                styles.top,
+                authStyles.top,
                 { backgroundColor: IsDark ? "#10b9811a" : "#f1ffe7" },
               ]}
             >
-              <LogIn size={32} color={Colors.light.mainColor2} />
+              <LogIn size={32} color={Colors.light.mainColorGreen} />
             </View>
             <View>
               <Text
                 style={[
-                  styles.topStrongText,
+                  authStyles.topStrongText,
                   {
                     color: IsDark ? "#ffffff" : "#111827",
                   },
@@ -53,7 +82,7 @@ const Login = () => {
               >
                 Tekrar Merhaba!
               </Text>
-              <Text style={[styles.topSmallText, { color: "#9ca3af" }]}>
+              <Text style={[authStyles.topSmallText, { color: "#9ca3af" }]}>
                 Serini bozmamak için giriş yap.
               </Text>
             </View>
@@ -80,31 +109,28 @@ const Login = () => {
         showPasswordToggle
       />
 
-      <TouchableOpacity style={styles.forgotPasswordContainer}>
-        <Text style={styles.forgotPasswordText}>Şifremi Unuttum</Text>
+      <TouchableOpacity style={authStyles.forgotPasswordContainer}>
+        <Text style={authStyles.forgotPasswordText}>Şifremi Unuttum</Text>
       </TouchableOpacity>
 
-      <Button
-        onPress={() => router.replace("/(tabs)")}
-        disabled={!email || !password}
-      >
+      <Button onPress={() => loginRequest()} disabled={!email || !password}>
         Giriş Yap
       </Button>
 
       {/* Bottom */}
-      <View style={styles.bottomContainer}>
+      <View style={authStyles.bottomContainer}>
         <View
           style={[
-            styles.bottomLine,
+            authStyles.bottomLine,
             {
               backgroundColor: IsDark ? "#1f2937" : "#f3f4f6",
             },
           ]}
         />
-        <Text style={styles.bottomLineText}>Veya şununla devam et</Text>
+        <Text style={authStyles.bottomLineText}>Veya şununla devam et</Text>
         <View
           style={[
-            styles.bottomLine,
+            authStyles.bottomLine,
             {
               backgroundColor: IsDark ? "#1f2937" : "#f3f4f6",
             },
@@ -112,12 +138,12 @@ const Login = () => {
         />
       </View>
 
-      <View style={styles.bottomLoginOptionContainer}>
+      <View style={authStyles.bottomLoginOptionContainer}>
         <TouchableOpacity
           onPress={() => null}
           activeOpacity={0.8}
           style={[
-            styles.bottomButton,
+            authStyles.bottomButton,
             { borderColor: IsDark ? "#374151" : "#e5e7eb" },
           ]}
         >
@@ -128,7 +154,7 @@ const Login = () => {
           />
           <Text
             style={[
-              styles.bottomButtonText,
+              authStyles.bottomButtonText,
               { color: IsDark ? "#9ca3af" : "#374151" },
             ]}
           >
@@ -140,7 +166,7 @@ const Login = () => {
           onPress={() => null}
           activeOpacity={0.8}
           style={[
-            styles.bottomButton,
+            authStyles.bottomButton,
             { borderColor: IsDark ? "#374151" : "#e5e7eb" },
           ]}
         >
@@ -151,7 +177,7 @@ const Login = () => {
           />
           <Text
             style={[
-              styles.bottomButtonText,
+              authStyles.bottomButtonText,
               { color: IsDark ? "#9ca3af" : "#374151" },
             ]}
           >

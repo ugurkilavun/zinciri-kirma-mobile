@@ -18,7 +18,7 @@ const InputField = ({
   const [isFocused, setIsFocused] = useState(false);
 
   const getBorderColor = () => {
-    if (isFocused) return Colors.light.mainColor2;
+    if (isFocused) return Colors.light.mainColorGreen;
     return IsDark ? "#374151" : "#e5e7eb";
   };
 
@@ -73,6 +73,7 @@ const InputField = ({
           placeholder={placeholder}
           placeholderTextColor="#9ca3af"
           secureTextEntry={type === "password" && !showPassword}
+          selectionColor={Colors.light.mainColorGreen}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           style={{

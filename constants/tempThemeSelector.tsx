@@ -1,1 +1,1 @@
-export const IsDark: boolean = true;
+export const IsDark: boolean = false;

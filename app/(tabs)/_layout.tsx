@@ -1,9 +1,12 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Colors } from "@/constants/themes";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 // Icons
 import Ionicons from "@expo/vector-icons/Ionicons";
+// Colors
+import { Colors } from "@/constants/themes";
+// !TEST
+import { IsDark } from "@/constants/tempThemeSelector";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -14,7 +17,9 @@ export default function TabLayout() {
         tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
         headerShown: false,
         sceneStyle: {
-          backgroundColor: "#18b13e",
+          backgroundColor: IsDark
+            ? Colors.dark.background
+            : Colors.light.background,
         },
       }}
     >
@@ -22,8 +27,12 @@ export default function TabLayout() {
         name="index"
         options={{
           title: "Home",
-          tabBarIcon: ({ color }) => (
-            <Ionicons name="rocket-outline" size={24} color={color} />
+          tabBarIcon: () => (
+            <Ionicons
+              name="rocket-outline"
+              size={24}
+              color={Colors.dark.background}
+            />
           ),
         }}
       />

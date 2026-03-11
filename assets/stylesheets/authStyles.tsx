@@ -1,7 +1,7 @@
 import { Colors } from "@/constants/themes";
 import { StyleSheet } from "react-native";
 
-export const styles = StyleSheet.create({
+export const authStyles = StyleSheet.create({
   safeAreaView: {
     flex: 1,
     paddingHorizontal: 24,
@@ -9,7 +9,9 @@ export const styles = StyleSheet.create({
 
   // Top
   topContainer: {
+    marginTop: 25,
     marginBottom: 32,
+    height: "auto"
   },
   top: {
     width: 64,
@@ -33,7 +35,7 @@ export const styles = StyleSheet.create({
     marginBottom: 32,
   },
   forgotPasswordText: {
-    color: Colors.light.mainColor2,
+    color: Colors.light.mainColorGreen,
     fontWeight: "900",
     fontSize: 14,
   },

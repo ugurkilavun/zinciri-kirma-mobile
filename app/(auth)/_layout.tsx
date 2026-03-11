@@ -28,6 +28,13 @@ export default function AuthLayout() {
           animation: "fade", // "shift" | "fade"
         }}
       />
+      <Tabs.Screen
+        name="register"
+        options={{
+          title: "register",
+          animation: "fade",
+        }}
+      />
     </Tabs>
   );
 }

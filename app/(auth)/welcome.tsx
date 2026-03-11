@@ -1,32 +1,38 @@
 import React from "react";
 import { View, Text } from "react-native";
-import { Flame } from "lucide-react-native";
+import { Flame, Link, Unlink } from "lucide-react-native";
 import Button from "@/components/Button";
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+// Stylesheets
 import { styles } from "@/assets/stylesheets/welcomeStyle";
+// Constants
 import { Colors } from "@/constants/themes";
 // !TEST
 import { IsDark } from "@/constants/tempThemeSelector";
-import { StatusBar } from "expo-status-bar";
 
 const Welcome = () => {
   return (
     <SafeAreaView
       style={[
         styles.safeAreaView,
-        { backgroundColor: IsDark ? "#111827" : "#ffffff" },
+        {
+          backgroundColor: IsDark
+            ? Colors.dark.background
+            : Colors.light.background,
+        },
       ]}
     >
-      <StatusBar style={IsDark ? "light": "dark" } />
+      <StatusBar style={IsDark ? "light" : "dark"} />
       <View style={styles.bodyContainer}>
         <View
           style={[
             styles.iconContainer,
-            { backgroundColor: Colors.light.mainColor2 },
+            { backgroundColor: Colors.light.mainColorGreen },
           ]}
         >
-          <Flame size={80} color="#fff" fill="#fff" />
+          <Link size={80} color="#ffffff" fill={Colors.light.mainColorGreen} />
           {/* <Flame size={80} color={Colors.light.mainColor2} fill={Colors.light.mainColor2} /> */}
         </View>
         <Text style={styles.bodyHeaderText}>Zinciri Kırma</Text>
@@ -40,7 +46,7 @@ const Welcome = () => {
         </Text>
       </View>
       <View style={{ gap: 16, paddingBottom: 32 }}>
-        <Button onPress={() => router.replace("/(auth)/login")}>
+        <Button onPress={() => router.replace("/(auth)/register")}>
           Hemen Başla
         </Button>
         <Button

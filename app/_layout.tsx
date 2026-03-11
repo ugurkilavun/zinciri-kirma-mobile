@@ -26,11 +26,22 @@ export default function RootLayout() {
       <Stack
         screenOptions={{
           headerShown: false,
+          contentStyle: {
+            backgroundColor: IsDark
+              ? Colors.dark.background
+              : Colors.light.background,
+          },
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="(tabs)"
+          options={{ headerShown: false, animation: "fade" }}
+        />
+        <Stack.Screen
+          name="(auth)"
+          options={{ headerShown: false, animation: "slide_from_right" }}
+        />
       </Stack>
       <StatusBar style={IsDark ? "light" : "dark"} />
     </ThemeProvider>

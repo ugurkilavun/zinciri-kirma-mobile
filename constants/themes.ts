@@ -12,11 +12,11 @@ const tintColorDark = '#fff';
 // #46a302
 export const Colors = {
   light: {
-    mainColor: "#10b981",
-    mainColor2: "#58cc02",
-    background: "#fff",
-    borderBottomColor: "#059669",
-    borderBottomColor2: "#51ad0a",
+    background: "#ffffff",
+    // Green colors
+    mainColorGreen: "#58cc02",
+    borderBottomColorGreen: "#51ad0a",
+
     // Def
     text: '#11181C',
     tint: tintColorLight,
@@ -25,11 +25,11 @@ export const Colors = {
     tabIconSelected: tintColorLight,
   },
   dark: {
-    mainColor: "#10b981",
-    mainColor2: "#58cc02",
-    background: "#111827",
-    borderBottomColor: "#064e3b",
-    borderBottomColor2: "#489c07",
+    background: "#111827", //  #111827 | #242424
+    // Green colors
+    mainColorGreen: "#58cc02",
+    borderBottomColorGreen: "#489c07",
+
     // Def
     text: '#ECEDEE',
     tint: tintColorDark,

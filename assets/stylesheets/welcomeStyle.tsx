@@ -26,7 +26,7 @@ export const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: "900",
     // color: "#10b981",
-    color: Colors.light.mainColor2,
+    color: Colors.light.mainColorGreen,
     marginBottom: 16,
     letterSpacing: -0.5,
   },
