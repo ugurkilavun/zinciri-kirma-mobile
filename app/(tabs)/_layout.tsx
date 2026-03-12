@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { Colors } from "@/constants/themes";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
@@ -6,10 +7,25 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+=======
+import { Tabs } from "expo-router";
+import React from "react";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+// Icons
+import Ionicons from "@expo/vector-icons/Ionicons";
+// Colors
+import { Colors } from "@/constants/themes";
+// !TEST
+import { IsDark } from "@/constants/tempThemeSelector";
+
+export default function TabLayout() {
+  const colorScheme = useColorScheme();
+>>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
 
   return (
     <Tabs
       screenOptions={{
+<<<<<<< HEAD
         headerShown: false,
         tabBarActiveTintColor: Colors.light.mainColorGreen,
         tabBarInactiveTintColor: "#94A3B8",
@@ -27,22 +43,40 @@ export default function TabLayout() {
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: "700",
+=======
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        headerShown: false,
+        sceneStyle: {
+          backgroundColor: IsDark
+            ? Colors.dark.background
+            : Colors.light.background,
+>>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
         },
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
+<<<<<<< HEAD
           title: "Ana Sayfa",
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? "home" : "home-outline"}
               size={22}
               color={color}
+=======
+          title: "Home",
+          tabBarIcon: () => (
+            <Ionicons
+              name="rocket-outline"
+              size={24}
+              color={Colors.dark.background}
+>>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
             />
           ),
         }}
       />
+<<<<<<< HEAD
 
       <Tabs.Screen
         name="statistics"
@@ -102,3 +136,8 @@ export default function TabLayout() {
     </Tabs>
   );
 }
+=======
+    </Tabs>
+  );
+}
+>>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c

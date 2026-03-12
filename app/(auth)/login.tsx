@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
@@ -8,6 +9,18 @@ import { ArrowLeft, Lock, LogIn, Mail } from "lucide-react-native";
 // Components
 import Button from "@/components/Button";
 import InputField from "@/components/InputField";
+=======
+import React, { useState } from "react";
+import { router } from "expo-router";
+import { View, Text, TouchableOpacity, Alert } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+// Icons
+import AntDesign from "@expo/vector-icons/AntDesign";
+import { ArrowLeft, LogIn, Mail, Lock } from "lucide-react-native";
+// Components
+import InputField from "@/components/InputField";
+import Button from "@/components/Button";
+>>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
 // Stylesheets
 import { authStyles } from "@/assets/stylesheets/authStyles";
 // Constants
@@ -31,7 +44,11 @@ const Login = () => {
         response.status === 200
       )
         Alert.alert("Alert Title", "Giriş başarılı", [
+<<<<<<< HEAD
           { text: "OK", onPress: () => router.replace("/(onboarding)") },
+=======
+          { text: "OK", onPress: () => router.replace("/(tabs)") },
+>>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
         ]);
       else
         Alert.alert("Hata", "Bilinmeyen bir hata oluştu", [

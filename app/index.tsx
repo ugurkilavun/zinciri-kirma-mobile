@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -5,6 +6,15 @@ import { SafeAreaView } from "react-native-safe-area-context";
 // Constants
 import { Colors } from "@/constants/themes";
 import { STORAGE_KEYS, storageService } from "@/src/services/storage/";
+=======
+import { ActivityIndicator, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
+// Constants
+import { Colors } from "@/constants/themes";
+import { storageService, STORAGE_KEYS } from "@/src/services/storage/";
+>>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
 // !TEST
 import { IsDark } from "@/constants/tempThemeSelector";
 
@@ -12,7 +22,10 @@ const Index = () => {
   const [isReady, setIsReady] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
+<<<<<<< HEAD
   const [onboardingCompleted, setOnboardingCompleted] = useState<boolean>(false);
+=======
+>>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
 
   // useEffect(s)
   useEffect(() => {
@@ -37,7 +50,11 @@ const Index = () => {
             STORAGE_KEYS.SETTINGS.THEME,
             "light",
           );
+<<<<<<< HEAD
           setIsReady(true);
+=======
+
+>>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
           return;
         }
 
@@ -49,6 +66,7 @@ const Index = () => {
         const refreshToken = await storageService.get<string>(
           STORAGE_KEYS.AUTH.REFRESH_TOKEN,
         );
+<<<<<<< HEAD
         const completed = await storageService.get<boolean>(
           STORAGE_KEYS.ONBOARDING.COMPLETED,
         );
@@ -56,6 +74,11 @@ const Index = () => {
         setAccessToken(accessToken);
         setRefreshToken(refreshToken);
         setOnboardingCompleted(!!completed);
+=======
+
+        setAccessToken(accessToken);
+        setRefreshToken(refreshToken);
+>>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
       } catch (error) {
         console.error("Session kontrol hatası:", error);
       } finally {
@@ -70,6 +93,7 @@ const Index = () => {
     if (!isReady) return;
 
     if (accessToken && refreshToken) {
+<<<<<<< HEAD
       if (onboardingCompleted) {
         router.replace("/(tabs)");
       } else {
@@ -81,13 +105,25 @@ const Index = () => {
   }, [isReady, accessToken, refreshToken, onboardingCompleted]);
 
   if (!isReady) return null;
+=======
+      router.replace("/(tabs)");
+    } else {
+      router.replace("/(auth)/welcome");
+    }
+  }, [isReady, accessToken, refreshToken]);
+
+  if (!isReady) return;
+>>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
 
   return (
     <SafeAreaView
       style={{
         flex: 1,
         backgroundColor: IsDark
+<<<<<<< HEAD
         
+=======
+>>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
           ? Colors.dark.background
           : Colors.dark.background,
       }}
