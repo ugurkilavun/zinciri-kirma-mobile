@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { router } from "expo-router";
 import {
   CalendarDays,
@@ -49,21 +48,10 @@ export default function HomeScreen() {
     [habits],
   );
 
-=======
-import { View, Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-// Constants
-import { Colors } from "@/constants/themes";
-// !TEST
-import { IsDark } from "@/constants/tempThemeSelector";
-
-export default function HomeScreen() {
->>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
   return (
     <SafeAreaView
       style={{
         flex: 1,
-<<<<<<< HEAD
         backgroundColor: IsDark ? Colors.dark.background : "#F7F8FA",
       }}
     >
@@ -163,7 +151,9 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeaderRow}>
             <View>
-              <Text style={styles.sectionTitleNoMargin}>Bugunku Aliskanliklar</Text>
+              <Text style={styles.sectionTitleNoMargin}>
+                Bugunku Aliskanliklar
+              </Text>
               <Text style={styles.completedInfo}>
                 {totalCompleted} / {habits.length} tamamlandi
               </Text>
@@ -532,23 +522,3 @@ const styles = StyleSheet.create({
     fontWeight: "800",
   },
 });
-=======
-        backgroundColor: IsDark
-          ? Colors.dark.background
-          : Colors.light.background,
-      }}
-    >
-      <View>
-        <Text
-          style={{
-            color: IsDark ? Colors.light.background : Colors.dark.background,
-            alignSelf: "center",
-          }}
-        >
-          Welcome
-        </Text>
-      </View>
-    </SafeAreaView>
-  );
-}
->>>>>>> fed558303fcd769b3e8e6893d4b6ebdbc8f54c3c
