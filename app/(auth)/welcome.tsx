@@ -16,7 +16,6 @@ import { IsDark } from "@/constants/tempThemeSelector";
 const Welcome = () => {
   // Languages
   const { t } = useTranslation("welcome");
-  console.log("t", t);
 
   return (
     <SafeAreaView

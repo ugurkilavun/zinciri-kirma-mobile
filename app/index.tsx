@@ -74,7 +74,6 @@ const Index = () => {
   useEffect(() => {
     if (!isReady) return;
 
-    console.log(accessToken);
     if (accessToken && refreshToken) {
       router.replace("/(tabs)");
     } else {
