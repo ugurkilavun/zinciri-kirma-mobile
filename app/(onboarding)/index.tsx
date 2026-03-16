@@ -15,14 +15,12 @@ import React, { useMemo, useState } from "react";
 import {
     Dimensions,
     Platform,
-    SafeAreaView,
     StyleSheet,
     Text,
     TouchableOpacity,
     View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import Button from "@/components/Button";
 import { IsDark } from "@/constants/tempThemeSelector";
 import { Colors } from "@/constants/themes";

@@ -1,33 +1,28 @@
-
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 // Icons
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ArrowLeft, Lock, LogIn, Mail } from "lucide-react-native";
 // Components
 import Button from "@/components/Button";
 import InputField from "@/components/InputField";
-
-
-
-
-
-// Icons
-
-// Components
-
 // Stylesheets
 import { authStyles } from "@/assets/stylesheets/authStyles";
 // Constants
 import { Colors } from "@/constants/themes";
-// services/api
+// src/services
+import { STORAGE_KEYS, storageService } from "@/src/services/storage/";
 import { authApi } from "@/src/services/api/endpoints/auth";
 // !TEST
 import { IsDark } from "@/constants/tempThemeSelector";
 
 const Login = () => {
+  // Languages
+  const { t } = useTranslation("auth");
+
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
@@ -41,13 +36,21 @@ const Login = () => {
         response.data.accessToken &&
         response.data.refreshToken &&
         response.status === 200
-      )
-      router.replace("/(tabs)");
-        //Alert.alert("Alert Title", "Giriş başarılı", [
-          // after register{ text: "OK", onPress: () => router.replace("/(onboarding)") },
-          //{ text: "OK", onPress: () => router.replace("/(tabs)") },
-        //]);
-      else
+      ) {
+
+        // Auths
+        await storageService.set<string>(
+          STORAGE_KEYS.AUTH.ACCESS_TOKEN,
+          response.data.accessToken,
+        );
+
+        await storageService.set<string>(
+          STORAGE_KEYS.AUTH.REFRESH_TOKEN,
+          response.data.refreshToken,
+        );
+
+        router.replace("/(tabs)");
+      } else
         Alert.alert("Hata", "Bilinmeyen bir hata oluştu", [
           { text: "OK", onPress: () => null },
         ]);
@@ -94,10 +97,10 @@ const Login = () => {
                   },
                 ]}
               >
-                Tekrar Merhaba!
+                {t("login.title")}
               </Text>
               <Text style={[authStyles.topSmallText, { color: "#9ca3af" }]}>
-                Serini bozmamak için giriş yap.
+                {t("login.description")}
               </Text>
             </View>
           </View>
@@ -106,15 +109,15 @@ const Login = () => {
 
       {/* Body */}
       <InputField
-        label="E-posta"
+        label={t("email")}
         icon={Mail}
         type="email"
         value={email}
         onChange={setEmail}
-        placeholder="ad@ornek.com"
+        placeholder={t("emailPlaceholder")}
       />
       <InputField
-        label="Şifre"
+        label={t("password")}
         icon={Lock}
         type="password"
         value={password}
@@ -124,11 +127,13 @@ const Login = () => {
       />
 
       <TouchableOpacity style={authStyles.forgotPasswordContainer}>
-        <Text style={authStyles.forgotPasswordText}>Şifremi Unuttum</Text>
+        <Text style={authStyles.forgotPasswordText}>
+          {t("login.forgotPassword")}
+        </Text>
       </TouchableOpacity>
 
       <Button onPress={() => loginRequest()} disabled={!email || !password}>
-        Giriş Yap
+        {t("login.login")}
       </Button>
 
       {/* Bottom */}
@@ -141,7 +146,7 @@ const Login = () => {
             },
           ]}
         />
-        <Text style={authStyles.bottomLineText}>Veya şununla devam et</Text>
+        <Text style={authStyles.bottomLineText}>{t("continueWith")}</Text>
         <View
           style={[
             authStyles.bottomLine,
@@ -172,7 +177,7 @@ const Login = () => {
               { color: IsDark ? "#9ca3af" : "#374151" },
             ]}
           >
-            Google ile Giriş Yap
+            {t("withGoogle")}
           </Text>
         </TouchableOpacity>
 
@@ -195,7 +200,7 @@ const Login = () => {
               { color: IsDark ? "#9ca3af" : "#374151" },
             ]}
           >
-            Apple ile Giriş Yap
+            {t("withApple")}
           </Text>
         </TouchableOpacity>
       </View>

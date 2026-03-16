@@ -22,6 +22,13 @@ export default function AuthLayout() {
       }}
     >
       <Tabs.Screen
+        name="welcome"
+        options={{
+          title: "Welcome",
+          animation: "fade",
+        }}
+      />
+      <Tabs.Screen
         name="login"
         options={{
           title: "Login",
@@ -31,7 +38,7 @@ export default function AuthLayout() {
       <Tabs.Screen
         name="register"
         options={{
-          title: "register",
+          title: "Register",
           animation: "fade",
         }}
       />
