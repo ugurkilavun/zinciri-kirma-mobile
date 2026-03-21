@@ -1,8 +1,6 @@
-
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 // Icons
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -13,12 +11,10 @@ import {
   Rocket,
   Sparkles,
   User,
-  UserPlus
+  UserPlus,
 } from "lucide-react-native";
 // Components
 import Button from "@/components/Button";
-
-// Components
 import InputField from "@/components/InputField";
 // Stylesheets
 import { authStyles } from "@/assets/stylesheets/authStyles";
@@ -26,6 +22,7 @@ import { authStyles } from "@/assets/stylesheets/authStyles";
 import { Colors } from "@/constants/themes";
 // /services/api
 import { authApi } from "@/src/services/api/endpoints/auth";
+import { STORAGE_KEYS, storageService } from "@/src/services/storage";
 // !TEST
 import { IsDark } from "@/constants/tempThemeSelector";
 
@@ -33,27 +30,49 @@ const Register = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
-  // Requests
   const registerRequest = async () => {
     try {
+      setLoading(true);
+
       const response = await authApi.register(name, email, password);
       console.log(response.status);
+      console.log(response.data);
+
       if (
-        response.data.accessToken &&
-        response.data.refreshToken &&
+        response.data?.accessToken &&
+        response.data?.refreshToken &&
         response.status === 201
-      )
-        Alert.alert("Alert Title", "Kayıt başarılı.", [
-          { text: "OK", onPress: () => router.replace("/(onboarding)") },
-          { text: "OK", onPress: () => router.replace("/(tabs)") },
+      ) {
+        await storageService.set(
+          STORAGE_KEYS.AUTH.ACCESS_TOKEN,
+          response.data.accessToken,
+        );
+
+        await storageService.set(
+          STORAGE_KEYS.AUTH.REFRESH_TOKEN,
+          response.data.refreshToken,
+        );
+
+        Alert.alert("Basarili", "Kayit basarili.", [
+          {
+            text: "OK",
+            onPress: () => router.replace("/(onboarding)"),
+          },
         ]);
-      else
-        Alert.alert("Hata", "Bilinmeyen bir hata oluştu", [
+      } else {
+        Alert.alert("Hata", "Bilinmeyen bir hata olustu", [
           { text: "OK", onPress: () => null },
         ]);
+      }
     } catch (error) {
-      console.log(error);
+      console.log("Register error:", error);
+      Alert.alert("Hata", "Kayit olurken bir hata olustu", [
+        { text: "OK", onPress: () => null },
+      ]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -68,15 +87,13 @@ const Register = () => {
         },
       ]}
     >
-      {/* Back */}
       <TouchableOpacity
         onPress={() => router.replace("/(auth)/welcome")}
-        style={{ backgroundColor: "none" }}
+        style={{ backgroundColor: "transparent" }}
       >
         <ArrowLeft size={32} color="#9ca3af" />
       </TouchableOpacity>
 
-      {/* ScrollView  */}
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -84,7 +101,6 @@ const Register = () => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Top */}
         <View style={authStyles.topContainer}>
           <View>
             <View style={{ flexDirection: "row", gap: 16 }}>
@@ -105,24 +121,23 @@ const Register = () => {
                     },
                   ]}
                 >
-                  Aramıza Katıl!
+                  Aramiza Katil!
                 </Text>
                 <Text style={[authStyles.topSmallText, { color: "#9ca3af" }]}>
-                  Yolculuğa başlamak için kaydol.
+                  Yolculuga baslamak icin kaydol.
                 </Text>
               </View>
             </View>
           </View>
         </View>
 
-        {/* Body */}
         <InputField
           label="Ad Soyad"
           icon={User}
           type="name"
           value={name}
           onChange={setName}
-          placeholder="Adınız Soyadınız"
+          placeholder="Adiniz Soyadiniz"
         />
         <InputField
           label="E-posta"
@@ -133,7 +148,7 @@ const Register = () => {
           placeholder="ad@ornek.com"
         />
         <InputField
-          label="Şifre"
+          label="Sifre"
           icon={Lock}
           type="password"
           value={password}
@@ -142,7 +157,6 @@ const Register = () => {
           showPasswordToggle
         />
 
-        {/* 1M+ Notification */}
         <View
           style={{
             flexDirection: "row",
@@ -152,13 +166,11 @@ const Register = () => {
             borderRadius: 16,
             marginTop: 16,
             marginBottom: 20,
-            // marginVertical: 24,
             borderWidth: 1,
             borderColor: IsDark ? "#374151" : "#d1fae5",
           }}
         >
           <Sparkles size={20} color={IsDark ? "#34D399" : "#10b981"} />
-          {/* Dark'ta daha açık yeşil ikon */}
           <Text
             style={{
               fontSize: 14,
@@ -166,19 +178,18 @@ const Register = () => {
               color: IsDark ? "#D1FAE5" : "#047857",
             }}
           >
-            1M+ kişi zinciri kırmıyor!
+            1M+ kisi zinciri kirmiyor!
           </Text>
         </View>
 
         <Button
-          onPress={() => registerRequest()}
-          disabled={!name || !email || !password}
+          onPress={registerRequest}
+          disabled={!name || !email || !password || loading}
           icon={Rocket}
         >
-          Hesap Oluştur
+          Hesap Olustur
         </Button>
 
-        {/* Bottom */}
         <View style={authStyles.bottomContainer}>
           <View
             style={[
@@ -188,7 +199,7 @@ const Register = () => {
               },
             ]}
           />
-          <Text style={authStyles.bottomLineText}>Veya şununla devam et</Text>
+          <Text style={authStyles.bottomLineText}>Veya sununla devam et</Text>
           <View
             style={[
               authStyles.bottomLine,
@@ -219,7 +230,7 @@ const Register = () => {
                 { color: IsDark ? "#9ca3af" : "#374151" },
               ]}
             >
-              Google ile Giriş Yap
+              Google ile Giris Yap
             </Text>
           </TouchableOpacity>
 
@@ -242,7 +253,7 @@ const Register = () => {
                 { color: IsDark ? "#9ca3af" : "#374151" },
               ]}
             >
-              Apple ile Giriş Yap
+              Apple ile Giris Yap
             </Text>
           </TouchableOpacity>
         </View>

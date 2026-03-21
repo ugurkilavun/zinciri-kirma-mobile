@@ -17,6 +17,7 @@ const Index = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
+        await storageService.clear();
         const firstLaunch = await storageService.get<boolean>(
           STORAGE_KEYS.AUTH.FIRST_LAUNCH,
         );
