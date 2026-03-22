@@ -83,16 +83,17 @@ export default function TabLayout() {
 
       <Tabs.Screen
         name="achievements"
-        options={{
-          title: "Rozetler",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "trophy" : "trophy-outline"}
-              size={22}
-              color={color}
-            />
-          ),
-        }}
+        options={{href:null,}}
+        // options={{
+        //   title: "Rozetler",
+        //   tabBarIcon: ({ color, focused }) => (
+        //     <Ionicons
+        //       name={focused ? "trophy" : "trophy-outline"}
+        //       size={22}
+        //       color={color}
+        //     />
+        //   ),
+        // }}
       />
 
       <Tabs.Screen
@@ -102,6 +103,19 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <Octicons
               name={focused ? "person-fill" : "person"}
+              size={22}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="leaderboard"
+        options={{
+          title: "Sıralama",
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "trophy" : "trophy-outline"}
               size={22}
               color={color}
             />

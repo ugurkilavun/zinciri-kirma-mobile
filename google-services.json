@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "970790038516",
+    "project_id": "zinciri-kirma-8c544",
+    "storage_bucket": "zinciri-kirma-8c544.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970790038516:android:20446fe729eb128a52e7a1",
+        "android_client_info": {
+          "package_name": "com.ozan.zincirikirma"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTZU_bP_JbmFoHqspHfFZiVbgoqITQ2NQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -16,8 +16,6 @@ import {
 } from "lucide-react-native";
 // Components
 import Button from "@/components/Button";
-
-// Components
 import InputField from "@/components/InputField";
 // Stylesheets
 import { authStyles } from "@/assets/stylesheets/authStyles";
@@ -36,15 +34,19 @@ const Register = () => {
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
-  // Requests
   const registerRequest = async () => {
     try {
+      setLoading(true);
+
       const response = await authApi.register(name, email, password);
       console.log(response.status);
+      console.log(response.data);
+
       if (
-        response.data.accessToken &&
-        response.data.refreshToken &&
+        response.data?.accessToken &&
+        response.data?.refreshToken &&
         response.status === 201
       ) {
         // Auths
@@ -63,8 +65,14 @@ const Register = () => {
         Alert.alert("Hata", "Bilinmeyen bir hata oluştu", [
           { text: "OK", onPress: () => null },
         ]);
+      }
     } catch (error) {
-      console.log(error);
+      console.log("Register error:", error);
+      Alert.alert("Hata", "Kayit olurken bir hata olustu", [
+        { text: "OK", onPress: () => null },
+      ]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -79,15 +87,13 @@ const Register = () => {
         },
       ]}
     >
-      {/* Back */}
       <TouchableOpacity
         onPress={() => router.replace("/(auth)/welcome")}
-        style={{ backgroundColor: "none" }}
+        style={{ backgroundColor: "transparent" }}
       >
         <ArrowLeft size={32} color="#9ca3af" />
       </TouchableOpacity>
 
-      {/* ScrollView  */}
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -95,7 +101,6 @@ const Register = () => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Top */}
         <View style={authStyles.topContainer}>
           <View>
             <View style={{ flexDirection: "row", gap: 16 }}>
@@ -116,24 +121,23 @@ const Register = () => {
                     },
                   ]}
                 >
-                  {t("register.title")}
+                  Aramiza Katil!
                 </Text>
                 <Text style={[authStyles.topSmallText, { color: "#9ca3af" }]}>
-                  {t("register.description")}
+                  Yolculuga baslamak icin kaydol.
                 </Text>
               </View>
             </View>
           </View>
         </View>
 
-        {/* Body */}
         <InputField
           label={t("name")}
           icon={User}
           type="name"
           value={name}
           onChange={setName}
-          placeholder={t("namePlaceholder")}
+          placeholder="Adiniz Soyadiniz"
         />
         <InputField
           label={t("email")}
@@ -144,7 +148,7 @@ const Register = () => {
           placeholder={t("namePlaceholder")}
         />
         <InputField
-          label={t("password")}
+          label="Sifre"
           icon={Lock}
           type="password"
           value={password}
@@ -153,7 +157,6 @@ const Register = () => {
           showPasswordToggle
         />
 
-        {/* 1M+ Notification */}
         <View
           style={{
             flexDirection: "row",
@@ -163,13 +166,11 @@ const Register = () => {
             borderRadius: 16,
             marginTop: 16,
             marginBottom: 20,
-            // marginVertical: 24,
             borderWidth: 1,
             borderColor: IsDark ? "#374151" : "#d1fae5",
           }}
         >
           <Sparkles size={20} color={IsDark ? "#34D399" : "#10b981"} />
-          {/* Dark'ta daha açık yeşil ikon */}
           <Text
             style={{
               fontSize: 14,
@@ -177,19 +178,18 @@ const Register = () => {
               color: IsDark ? "#D1FAE5" : "#047857",
             }}
           >
-            {t("register.notification")}
+            1M+ kisi zinciri kirmiyor!
           </Text>
         </View>
 
         <Button
-          onPress={() => registerRequest()}
-          disabled={!name || !email || !password}
+          onPress={registerRequest}
+          disabled={!name || !email || !password || loading}
           icon={Rocket}
         >
-          {t("register.signUp")}
+          Hesap Olustur
         </Button>
 
-        {/* Bottom */}
         <View style={authStyles.bottomContainer}>
           <View
             style={[
@@ -199,7 +199,7 @@ const Register = () => {
               },
             ]}
           />
-          <Text style={authStyles.bottomLineText}>{t("continueWith")}</Text>
+          <Text style={authStyles.bottomLineText}>Veya sununla devam et</Text>
           <View
             style={[
               authStyles.bottomLine,
@@ -230,7 +230,7 @@ const Register = () => {
                 { color: IsDark ? "#9ca3af" : "#374151" },
               ]}
             >
-              {t("withGoogle")}
+              Google ile Giris Yap
             </Text>
           </TouchableOpacity>
 
@@ -253,7 +253,7 @@ const Register = () => {
                 { color: IsDark ? "#9ca3af" : "#374151" },
               ]}
             >
-              {t("withApple")}
+              Apple ile Giris Yap
             </Text>
           </TouchableOpacity>
         </View>

@@ -19,6 +19,7 @@ const Index = () => {
       // storageService.clear();
 
       try {
+        await storageService.clear();
         const firstLaunch = await storageService.get<boolean>(
           STORAGE_KEYS.AUTH.FIRST_LAUNCH,
         );

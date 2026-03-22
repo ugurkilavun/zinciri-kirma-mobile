@@ -7,7 +7,7 @@ import {
   Plus,
   Trophy,
 } from "lucide-react-native";
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Dimensions,
   ScrollView,
@@ -17,36 +17,415 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import { useFocusEffect } from "@react-navigation/native";
+import { getAuthConfig } from "@/src/services/api/authHeaders";
 import { IsDark } from "@/constants/tempThemeSelector";
 import { Colors } from "@/constants/themes";
 import { useHabits } from "@/src/context/HabitContext";
+import apiClient from "@/src/services/api/apiClient";
 
 const { width } = Dimensions.get("window");
 
+type ProfileResponse = {
+  userId: string;
+  name: string;
+  totalXp: number;
+  level: number;
+  currentStreak: number;
+  longestStreak: number;
+  completedDays: number;
+  badgeCount: number;
+  recoveryRemaining: number;
+};
+
+type HabitDaySummary = {
+  date: string;
+  done: boolean;
+};
+
+type HabitLog = {
+  id: string;
+  habitId: string;
+  userId: string;
+  logDate: string;
+  status: "DONE" | "MISSED" | "PARTIAL";
+  progress: number;
+  earnedXp: number;
+  createdAt: string;
+};
+
+type HabitStats = {
+  currentStreak: number;
+  longestStreak: number;
+  completedThisMonth: number;
+  doneToday: boolean;
+  last7Days: HabitDaySummary[];
+};
+
+type HabitResponse = {
+  id: string;
+  title: string;
+  emoji: string;
+  color: string;
+  frequency: "DAILY" | "WEEKLY" | "CUSTOM";
+  reminderEnabled: boolean;
+  targetValue: number;
+  isArchived: boolean;
+  createdAt: string;
+  updatedAt: string;
+  stats?: HabitStats;
+  logs?: HabitLog[];
+};
+
+function todayKey() {
+  const d = new Date();
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+function getStartOfWeek(date = new Date()) {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+
+function isSameDay(a: string | Date, b: string | Date) {
+  return toLocalDateKey(String(a)) === toLocalDateKey(String(b));
+}
+
+
+function toLocalDateKey(dateString: string) {
+  const d = new Date(dateString);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getDayLetter(dateString: string) {
+  const map = ["Pz", "Pt", "Sa", "Ça", "Pe", "Cu", "Ct"];
+  return map[new Date(dateString).getDay()];
+}
+
+
+function getEndOfWeek(date = new Date()) {
+  const start = getStartOfWeek(date);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  end.setHours(23, 59, 59, 999);
+  return end;
+}
+
+function getStartOfMonth(date = new Date()) {
+  const d = new Date(date.getFullYear(), date.getMonth(), 1);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function getEndOfMonth(date = new Date()) {
+  const d = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  d.setHours(23, 59, 59, 999);
+  return d;
+}
+function getCurrentPeriodKey(
+  frequency: "DAILY" | "WEEKLY" | "CUSTOM",
+  createdAt?: string,
+  now = new Date(),
+) {
+  const current = new Date(now);
+  current.setHours(0, 0, 0, 0);
+
+  if (frequency === "DAILY") {
+    return toLocalDateKey(current);
+  }
+
+  if (frequency === "WEEKLY") {
+    return toLocalDateKey(getStartOfWeek(current));
+  }
+
+  if (frequency === "CUSTOM") {
+    if (!createdAt) return toLocalDateKey(current);
+
+    const anchor = new Date(createdAt);
+    anchor.setHours(0, 0, 0, 0);
+
+    const diffMs = current.getTime() - anchor.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    const cycleLength = 30;
+    const cycleIndex = Math.floor(Math.max(diffDays, 0) / cycleLength);
+
+    const periodStart = new Date(anchor);
+    periodStart.setDate(anchor.getDate() + cycleIndex * cycleLength);
+    periodStart.setHours(0, 0, 0, 0);
+
+    return toLocalDateKey(periodStart);
+  }
+
+  return toLocalDateKey(current);
+}
+function countDoneLogsInRange(
+  logs: HabitLog[] = [],
+  start: Date,
+  end: Date,
+) {
+  return logs.filter((log) => {
+    if (log.status !== "DONE") return false;
+    const d = new Date(log.logDate);
+    return d >= start && d <= end;
+  }).length;
+}
+
 export default function HomeScreen() {
-  const { habits, toggleHabit } = useHabits();
+  const { habits: localHabits, toggleHabit } = useHabits();
+
+  const [profile, setProfile] = useState<ProfileResponse | null>(null);
+  const [backendHabits, setBackendHabits] = useState<HabitResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchHomeData = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      const authConfig = await getAuthConfig();
+
+      const [profileRes, habitsRes] = await Promise.all([
+        apiClient.get("/v1/gamification/profile", authConfig),
+        apiClient.get("/v1/habits", authConfig),
+      ]);
+
+      setProfile(profileRes.data);
+      setBackendHabits(habitsRes.data ?? []);
+    } catch (error) {
+      console.log("Home data fetch fallback to local context:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchHomeData();
+    }, [fetchHomeData]),
+  );
+
+  const hasBackendData = backendHabits.length > 0;
+
+  const displayHabits = useMemo(() => {
+    if (hasBackendData) {
+      return backendHabits.map((habit) => {
+        let progress = 0;
+        let completed = false;
+        let doneToday = false;
+
+        const currentPeriodKey = getCurrentPeriodKey(
+          habit.frequency,
+          habit.createdAt,
+        );
+        const currentPeriodLog = (habit.logs ?? []).find(
+          (log) => toLocalDateKey(log.logDate) === currentPeriodKey,
+        );
+
+        if (habit.frequency === "DAILY") {
+          progress = currentPeriodLog?.progress ?? 0;
+          completed =
+            progress >= habit.targetValue || habit.stats?.doneToday === true;
+          doneToday = completed;
+        }
+
+        if (habit.frequency === "WEEKLY") {
+          progress = currentPeriodLog?.progress ?? 0;
+          completed = progress >= habit.targetValue;
+
+          const todayLog = (habit.logs ?? []).find(
+            (log) => toLocalDateKey(log.createdAt) === toLocalDateKey(new Date()),
+          );
+          doneToday = !!todayLog;
+        }
+
+        if (habit.frequency === "CUSTOM") {
+          progress = currentPeriodLog?.progress ?? 0;
+          completed = progress >= habit.targetValue;
+
+          const todayLog = (habit.logs ?? []).find(
+            (log) => toLocalDateKey(log.createdAt) === toLocalDateKey(new Date()),
+          );
+          doneToday = !!todayLog;
+        }
+
+        return {
+          id: habit.id,
+          title: habit.title,
+          emoji: habit.emoji,
+          color: habit.color,
+          completed,
+          progress,
+          goal: habit.targetValue,
+          streak: habit.stats?.currentStreak ?? 0,
+          frequency: habit.frequency,
+          doneToday,
+          backendRaw: habit,
+        };
+      });
+    }
+
+    return localHabits.map((habit) => ({
+      id: habit.id,
+      title: habit.title,
+      emoji: habit.emoji,
+      color: habit.color,
+      completed: habit.completed,
+      progress: habit.progress,
+      goal: habit.goal,
+      streak: habit.streak,
+      frequency: "DAILY" as const,
+      doneToday: habit.completed,
+      backendRaw: null,
+    }));
+  }, [hasBackendData, backendHabits, localHabits]);
 
   const stats = {
-    streak: habits.length ? Math.max(...habits.map((h) => h.streak), 0) : 0,
-    xp: habits.filter((h) => h.completed).length * 50 + 1200,
-    hearts: 5,
+    streak:
+      profile?.currentStreak ??
+      (localHabits.length ? Math.max(...localHabits.map((h) => h.streak), 0) : 0),
+    xp:
+      profile?.totalXp ??
+      localHabits.filter((h) => h.completed).length * 50 + 1200,
+    hearts: profile?.recoveryRemaining ?? 5,
   };
+  
+  const weekData = useMemo(() => {
+  const start = getStartOfWeek(new Date());
+  const today = todayKey();
 
-  const weekData = [
-    { day: "P", completed: true },
-    { day: "S", completed: true },
-    { day: "C", completed: true },
-    { day: "P", completed: true },
-    { day: "C", completed: true, isToday: true },
-    { day: "C", completed: false },
-    { day: "P", completed: false },
-  ];
+  const days = Array.from({ length: 7 }, (_, index) => {
+    const d = new Date(start);
+    d.setDate(start.getDate() + index);
+    const key = toLocalDateKey(d);
+
+    return {
+      date: key,
+      day: getDayLetter(key),
+      isToday: key === today,
+    };
+  });
+
+  if (!hasBackendData) {
+    const todayCompleted =
+      displayHabits.length > 0 && displayHabits.every((h) => h.doneToday);
+
+    return days.map((day) => ({
+      day: day.day,
+      isToday: day.isToday,
+      completed: day.isToday ? todayCompleted : false,
+    }));
+  }
+
+  return days.map((day) => {
+    const completedHabitsCount = backendHabits.filter((habit) => {
+      const logs = habit.logs ?? [];
+
+      if (habit.frequency === "DAILY") {
+        return logs.some(
+          (log) =>
+            toLocalDateKey(log.logDate) === day.date &&
+            log.status === "DONE",
+        );
+      }
+
+      if (habit.frequency === "WEEKLY" || habit.frequency === "CUSTOM") {
+        return logs.some(
+          (log) =>
+            toLocalDateKey(log.createdAt) === day.date &&
+            (log.status === "DONE" || log.status === "PARTIAL"),
+        );
+      }
+
+      return false;
+    }).length;
+
+    const completed =
+      backendHabits.length > 0 &&
+      completedHabitsCount === backendHabits.length;
+
+    return {
+      day: day.day,
+      isToday: day.isToday,
+      completed,
+    };
+  });
+}, [backendHabits, displayHabits, hasBackendData]);
 
   const totalCompleted = useMemo(
-    () => habits.filter((h) => h.completed).length,
-    [habits],
+    () => displayHabits.filter((h) => h.completed).length,
+    [displayHabits],
   );
+
+  const handleHabitPress = async (habit: (typeof displayHabits)[number]) => {
+    console.log("Pressed habit:", {
+      id: habit.id,
+      title: habit.title,
+      frequency: habit.frequency,
+      completed: habit.completed,
+      progress: habit.progress,
+      goal: habit.goal,
+      hasBackendData,
+    });
+
+    if (!hasBackendData || !habit.backendRaw) {
+      console.log("Falling back to local toggle");
+      toggleHabit(habit.id);
+      return;
+    }
+
+    try {
+      if (habit.completed) {
+        console.log("Habit already completed, returning");
+        return;
+      }
+
+      const authConfig = await getAuthConfig();
+
+      console.log("Sending check-in request...");
+      const res = await apiClient.post(
+        `/v1/habits/${habit.id}/check-in`,
+        {
+          date: todayKey(),
+          status: "PARTIAL",
+          progress: 1,
+        },
+        authConfig,
+      );
+
+      console.log("Check-in response:", res.data);
+
+      await fetchHomeData();
+      console.log("Home data refreshed");
+    } catch (error: any) {
+      console.log(
+        "Habit check-in error:",
+        error?.response?.status,
+        error?.response?.data,
+        error?.message,
+      );
+    }
+  };
+
+  const handleCalendarPress = () => {
+    const firstHabitId = backendHabits[0]?.id;
+    if (firstHabitId) {
+      router.push({
+        pathname: "/(tabs)/calendar",
+        params: { habitId: firstHabitId },
+      });
+      return;
+    }
+
+    router.push("/(tabs)/calendar");
+  };
 
   return (
     <SafeAreaView
@@ -91,7 +470,7 @@ export default function HomeScreen() {
         <TouchableOpacity
           activeOpacity={0.9}
           style={styles.streakCard}
-          onPress={() => router.push("/(tabs)/calendar")}
+          onPress={handleCalendarPress}
         >
           <View style={styles.streakCardTextArea}>
             <Text style={styles.streakLabel}>Mevcut Streak</Text>
@@ -155,7 +534,7 @@ export default function HomeScreen() {
                 Bugunku Aliskanliklar
               </Text>
               <Text style={styles.completedInfo}>
-                {totalCompleted} / {habits.length} tamamlandi
+                {totalCompleted} / {displayHabits.length} tamamlandi
               </Text>
             </View>
 
@@ -168,7 +547,7 @@ export default function HomeScreen() {
           </View>
 
           <View style={styles.habitsList}>
-            {habits.map((habit) => (
+            {displayHabits.map((habit) => (
               <TouchableOpacity
                 key={habit.id}
                 activeOpacity={0.9}
@@ -176,7 +555,7 @@ export default function HomeScreen() {
                   styles.habitCard,
                   habit.completed && styles.habitCardCompleted,
                 ]}
-                onPress={() => toggleHabit(habit.id)}
+                onPress={() => handleHabitPress(habit)}
               >
                 <View
                   style={[
@@ -196,10 +575,7 @@ export default function HomeScreen() {
                         style={[
                           styles.progressFill,
                           {
-                            width: `${Math.min(
-                              100,
-                              (habit.progress / habit.goal) * 100,
-                            )}%`,
+                            width: `${habit.goal > 0 ? Math.min(100, (habit.progress / habit.goal) * 100) : 0}%`,
                             backgroundColor: habit.completed
                               ? Colors.light.mainColorGreen
                               : "#D1D5DB",
@@ -215,7 +591,7 @@ export default function HomeScreen() {
               </TouchableOpacity>
             ))}
 
-            {habits.length === 0 && (
+            {!loading && displayHabits.length === 0 && (
               <View style={styles.emptyCard}>
                 <Text style={styles.emptyTitle}>Henuz aliskanlik yok</Text>
                 <Text style={styles.emptyText}>
