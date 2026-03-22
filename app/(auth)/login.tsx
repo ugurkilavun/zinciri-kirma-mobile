@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as AppleAuthentication from "expo-apple-authentication";
+import { useTranslation } from "react-i18next";
+// Icons
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ArrowLeft, Lock, LogIn, Mail } from "lucide-react-native";
 import {
@@ -18,10 +20,12 @@ import {
 
 import Button from "@/components/Button";
 import InputField from "@/components/InputField";
+// Stylesheets
 import { authStyles } from "@/assets/stylesheets/authStyles";
 import { Colors } from "@/constants/themes";
+// src/services
+import { STORAGE_KEYS, storageService } from "@/src/services/storage/";
 import { authApi } from "@/src/services/api/endpoints/auth";
-import { STORAGE_KEYS, storageService } from "@/src/services/storage";
 import { IsDark } from "@/constants/tempThemeSelector";
 
 const GOOGLE_WEB_CLIENT_ID =
@@ -31,6 +35,9 @@ const GOOGLE_IOS_CLIENT_ID =
   "118200182956-lakjbq4lhagm0ipb2jsh3rafhquqq8l2.apps.googleusercontent.com";
 
 const Login = () => {
+  // Languages
+  const { t } = useTranslation("auth");
+
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -55,8 +62,8 @@ const Login = () => {
       STORAGE_KEYS.AUTH.REFRESH_TOKEN,
       data.refreshToken,
     );
-
-    router.replace("/(onboarding)");
+router.replace("/(tabs)");
+    // router.replace("/(onboarding)");
   };
 
   const loginRequest = async () => {
@@ -70,10 +77,25 @@ const Login = () => {
         response.data?.refreshToken &&
         response.status === 200
       ) {
+        
         await saveTokensAndRoute(response.data);
-      } else {
-        Alert.alert("Hata", "Bilinmeyen bir hata olustu");
-      }
+ 
+        // Auths
+       // await storageService.set<string>(
+          //STORAGE_KEYS.AUTH.ACCESS_TOKEN,
+          //response.data.accessToken,
+       // );
+
+       // await storageService.set<string>(
+          //STORAGE_KEYS.AUTH.REFRESH_TOKEN,
+          //response.data.refreshToken,
+        //);
+
+        //router.replace("/(tabs)");
+      } else
+        Alert.alert("Hata", "Bilinmeyen bir hata oluştu", [
+          { text: "OK", onPress: () => null },
+        ]);
     } catch (error) {
       console.log("Login error:", error);
       Alert.alert("Hata", "Giris yapilirken bir hata olustu");
@@ -183,7 +205,7 @@ const Login = () => {
                   { color: IsDark ? "#ffffff" : "#111827" },
                 ]}
               >
-                Tekrar Merhaba!
+                {t("login.title")}
               </Text>
               <Text style={[authStyles.topSmallText, { color: "#9ca3af" }]}>
                 Serini bozmamak icin giris yap.
@@ -194,12 +216,12 @@ const Login = () => {
       </View>
 
       <InputField
-        label="E-posta"
+        label={t("email")}
         icon={Mail}
         type="email"
         value={email}
         onChange={setEmail}
-        placeholder="ad@ornek.com"
+        placeholder={t("emailPlaceholder")}
       />
 
       <InputField
@@ -213,11 +235,13 @@ const Login = () => {
       />
 
       <TouchableOpacity style={authStyles.forgotPasswordContainer}>
-        <Text style={authStyles.forgotPasswordText}>Sifremi Unuttum</Text>
+        <Text style={authStyles.forgotPasswordText}>
+          {t("login.forgotPassword")}
+        </Text>
       </TouchableOpacity>
 
-      <Button onPress={loginRequest} disabled={!email || !password || loading}>
-        Giris Yap
+      <Button onPress={() => loginRequest()} disabled={!email || !password}>
+        {t("login.login")}
       </Button>
 
       <View style={authStyles.bottomContainer}>
@@ -275,21 +299,9 @@ const Login = () => {
             ]}
             disabled={loading}
           >
-            <AntDesign
-              name="apple"
-              size={24}
-              color={IsDark ? "#9ca3af" : "#374151"}
-            />
-            <Text
-              style={[
-                authStyles.bottomButtonText,
-                { color: IsDark ? "#9ca3af" : "#374151" },
-              ]}
-            >
-              Apple ile Giris Yap
-            </Text>
-          </TouchableOpacity>
-        )}
+            {t("withApple")}
+          </Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );

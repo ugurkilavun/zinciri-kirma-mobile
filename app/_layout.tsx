@@ -7,6 +7,7 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import * as SystemUI from "expo-system-ui";
 import "react-native-reanimated";
+import "@/src/services/i18n/i18n";
 
 export const unstable_settings = {
   anchor: "(tabs)",

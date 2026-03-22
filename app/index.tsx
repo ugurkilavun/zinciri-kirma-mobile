@@ -2,9 +2,9 @@ import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
 import { IsDark } from "@/constants/tempThemeSelector";
 import { Colors } from "@/constants/themes";
+// src/services
 import { STORAGE_KEYS, storageService } from "@/src/services/storage/";
 
 const Index = () => {
@@ -16,6 +16,8 @@ const Index = () => {
 
   useEffect(() => {
     const checkSession = async () => {
+      // storageService.clear();
+
       try {
         await storageService.clear();
         const firstLaunch = await storageService.get<boolean>(
@@ -23,14 +25,22 @@ const Index = () => {
         );
 
         if (firstLaunch === null) {
+          // First Launch
           await storageService.set<boolean>(
             STORAGE_KEYS.AUTH.FIRST_LAUNCH,
             false,
           );
 
+          // Theme
           await storageService.set<string>(
             STORAGE_KEYS.SETTINGS.THEME,
             "light",
+          );
+
+          // Language
+          await storageService.set<string>(
+            STORAGE_KEYS.SETTINGS.LANGUAGE,
+            "en",
           );
 
           setIsReady(true);
@@ -66,11 +76,7 @@ const Index = () => {
     if (!isReady) return;
 
     if (accessToken && refreshToken) {
-      if (onboardingCompleted) {
-        router.replace("/(tabs)");
-      } else {
-        router.replace("/(onboarding)");
-      }
+      router.replace("/(tabs)");
     } else {
       router.replace("/(auth)/welcome");
     }

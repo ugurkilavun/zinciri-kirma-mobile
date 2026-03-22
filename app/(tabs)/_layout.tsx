@@ -1,8 +1,27 @@
-import { Colors } from "@/constants/themes";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
 import React from "react";
+import { TouchableOpacity, View, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+// Icons
+import { Plus } from "lucide-react-native";
+import Octicons from "@expo/vector-icons/Octicons";
+import Ionicons from "@expo/vector-icons/Ionicons";
+// Colors
+import { Colors } from "@/constants/themes";
+
+const CreateHabitButton = ({ onPress }: { onPress: any }) => {
+  return (
+    <TouchableOpacity
+      style={styles.createHabitButtonContainer}
+      onPress={onPress}
+      activeOpacity={0.8}
+    >
+      <View style={styles.createHabitButtonInner}>
+        <Plus size={28} strokeWidth={3} color={"#fff"} />
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
@@ -28,8 +47,8 @@ export default function TabLayout() {
         options={{
           title: "Ana Sayfa",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "home" : "home-outline"}
+            <Octicons
+              name={focused ? "home-fill" : "home"}
               size={22}
               color={color}
             />
@@ -48,6 +67,17 @@ export default function TabLayout() {
               color={color}
             />
           ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="create-habit"
+        // component={CreateHabitScreen}
+        options={{
+          tabBarButton: (props) => (
+            <CreateHabitButton onPress={props.onPress} />
+          ),
+          tabBarLabel: () => null,
         }}
       />
 
@@ -71,8 +101,8 @@ export default function TabLayout() {
         options={{
           title: "Profil",
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "person" : "person-outline"}
+            <Octicons
+              name={focused ? "person-fill" : "person"}
               size={22}
               color={color}
             />
@@ -95,7 +125,32 @@ export default function TabLayout() {
 
       {/* TAB BAR'DA GÖZÜKMESİN */}
       <Tabs.Screen name="calendar" options={{ href: null }} />
-      <Tabs.Screen name="create-habit" options={{ href: null }} />
     </Tabs>
   );
 }
+
+const styles = StyleSheet.create({
+  createHabitButtonContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  createHabitButtonInner: {
+    backgroundColor: Colors.light.mainColorGreen,
+    position: "absolute",
+    top: -18,
+    width: 60,
+    height: 57,
+    borderRadius: 18,
+    borderBottomWidth: 5,
+    borderBottomColor: Colors.light.borderBottomColorGreen,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    // ios
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    // android
+    elevation: 6,
+  },
+});

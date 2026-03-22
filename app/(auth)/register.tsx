@@ -2,6 +2,7 @@ import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useTranslation } from "react-i18next";
 // Icons
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
@@ -20,13 +21,16 @@ import InputField from "@/components/InputField";
 import { authStyles } from "@/assets/stylesheets/authStyles";
 // Constants
 import { Colors } from "@/constants/themes";
-// /services/api
+// src/services
 import { authApi } from "@/src/services/api/endpoints/auth";
-import { STORAGE_KEYS, storageService } from "@/src/services/storage";
+import { STORAGE_KEYS, storageService } from "@/src/services/storage/";
 // !TEST
 import { IsDark } from "@/constants/tempThemeSelector";
 
 const Register = () => {
+  // Languages
+  const { t } = useTranslation("auth");
+
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -45,24 +49,20 @@ const Register = () => {
         response.data?.refreshToken &&
         response.status === 201
       ) {
-        await storageService.set(
+        // Auths
+        await storageService.set<string>(
           STORAGE_KEYS.AUTH.ACCESS_TOKEN,
           response.data.accessToken,
         );
 
-        await storageService.set(
+        await storageService.set<string>(
           STORAGE_KEYS.AUTH.REFRESH_TOKEN,
           response.data.refreshToken,
         );
 
-        Alert.alert("Basarili", "Kayit basarili.", [
-          {
-            text: "OK",
-            onPress: () => router.replace("/(onboarding)"),
-          },
-        ]);
-      } else {
-        Alert.alert("Hata", "Bilinmeyen bir hata olustu", [
+        router.replace("/(onboarding)");
+      } else
+        Alert.alert("Hata", "Bilinmeyen bir hata oluştu", [
           { text: "OK", onPress: () => null },
         ]);
       }
@@ -132,7 +132,7 @@ const Register = () => {
         </View>
 
         <InputField
-          label="Ad Soyad"
+          label={t("name")}
           icon={User}
           type="name"
           value={name}
@@ -140,12 +140,12 @@ const Register = () => {
           placeholder="Adiniz Soyadiniz"
         />
         <InputField
-          label="E-posta"
+          label={t("email")}
           icon={Mail}
           type="email"
           value={email}
           onChange={setEmail}
-          placeholder="ad@ornek.com"
+          placeholder={t("namePlaceholder")}
         />
         <InputField
           label="Sifre"
