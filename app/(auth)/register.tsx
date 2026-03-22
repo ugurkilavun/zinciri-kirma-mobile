@@ -1,8 +1,8 @@
 import { router } from "expo-router";
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Alert, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTranslation } from "react-i18next";
 // Icons
 import AntDesign from "@expo/vector-icons/AntDesign";
 import {
@@ -61,7 +61,7 @@ const Register = () => {
         );
 
         router.replace("/(onboarding)");
-      } else
+      } else {
         Alert.alert("Hata", "Bilinmeyen bir hata oluştu", [
           { text: "OK", onPress: () => null },
         ]);
@@ -183,7 +183,7 @@ const Register = () => {
         </View>
 
         <Button
-          onPress={registerRequest}
+          onPress={() => registerRequest()}
           disabled={!name || !email || !password || loading}
           icon={Rocket}
         >

@@ -1,7 +1,7 @@
-import { Tabs } from "expo-router";
-import React from "react";
 import { Colors } from "@/constants/themes";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Tabs } from "expo-router";
+import React from "react";
 // !TEST
 import { IsDark } from "@/constants/tempThemeSelector";
 

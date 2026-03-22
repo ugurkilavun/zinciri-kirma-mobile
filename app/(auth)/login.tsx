@@ -1,31 +1,25 @@
+import * as AppleAuthentication from "expo-apple-authentication";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  Platform,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import * as AppleAuthentication from "expo-apple-authentication";
 import { useTranslation } from "react-i18next";
+import { Alert, Platform, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 // Icons
+import Button from "@/components/Button";
+import InputField from "@/components/InputField";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { ArrowLeft, Lock, LogIn, Mail } from "lucide-react-native";
 import {
   GoogleSignin,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
-
-import Button from "@/components/Button";
-import InputField from "@/components/InputField";
+import { ArrowLeft, Lock, LogIn, Mail } from "lucide-react-native";
 // Stylesheets
 import { authStyles } from "@/assets/stylesheets/authStyles";
 import { Colors } from "@/constants/themes";
 // src/services
-import { STORAGE_KEYS, storageService } from "@/src/services/storage/";
 import { authApi } from "@/src/services/api/endpoints/auth";
+import { STORAGE_KEYS, storageService } from "@/src/services/storage/";
+// ! TEST
 import { IsDark } from "@/constants/tempThemeSelector";
 
 const GOOGLE_WEB_CLIENT_ID =
@@ -53,16 +47,13 @@ const Login = () => {
     accessToken: string;
     refreshToken: string;
   }) => {
-    await storageService.clear();
-    await storageService.set(
-      STORAGE_KEYS.AUTH.ACCESS_TOKEN,
-      data.accessToken,
-    );
+    // await storageService.clear();
+    await storageService.set(STORAGE_KEYS.AUTH.ACCESS_TOKEN, data.accessToken);
     await storageService.set(
       STORAGE_KEYS.AUTH.REFRESH_TOKEN,
       data.refreshToken,
     );
-router.replace("/(tabs)");
+    router.replace("/(tabs)");
     // router.replace("/(onboarding)");
   };
 
@@ -77,21 +68,8 @@ router.replace("/(tabs)");
         response.data?.refreshToken &&
         response.status === 200
       ) {
-        
-        await saveTokensAndRoute(response.data);
- 
         // Auths
-       // await storageService.set<string>(
-          //STORAGE_KEYS.AUTH.ACCESS_TOKEN,
-          //response.data.accessToken,
-       // );
-
-       // await storageService.set<string>(
-          //STORAGE_KEYS.AUTH.REFRESH_TOKEN,
-          //response.data.refreshToken,
-        //);
-
-        //router.replace("/(tabs)");
+        await saveTokensAndRoute(response.data);
       } else
         Alert.alert("Hata", "Bilinmeyen bir hata oluştu", [
           { text: "OK", onPress: () => null },
@@ -266,7 +244,7 @@ router.replace("/(tabs)");
 
       <View style={authStyles.bottomLoginOptionContainer}>
         <TouchableOpacity
-          onPress={handleGoogleLogin}
+          onPress={() => handleGoogleLogin()}
           activeOpacity={0.8}
           style={[
             authStyles.bottomButton,
@@ -299,9 +277,16 @@ router.replace("/(tabs)");
             ]}
             disabled={loading}
           >
-            {t("withApple")}
-          </Text>
-        </TouchableOpacity>
+            <Text
+              style={[
+                authStyles.bottomButtonText,
+                { color: IsDark ? "#9ca3af" : "#374151" },
+              ]}
+            >
+              {t("withApple")}
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
     </SafeAreaView>
   );
