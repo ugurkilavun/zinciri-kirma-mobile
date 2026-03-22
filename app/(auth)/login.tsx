@@ -186,7 +186,7 @@ const Login = () => {
                 {t("login.title")}
               </Text>
               <Text style={[authStyles.topSmallText, { color: "#9ca3af" }]}>
-                Serini bozmamak icin giris yap.
+                {t("login.description")}
               </Text>
             </View>
           </View>
@@ -203,7 +203,7 @@ const Login = () => {
       />
 
       <InputField
-        label="Sifre"
+        label={t("password")}
         icon={Lock}
         type="password"
         value={password}
@@ -231,7 +231,7 @@ const Login = () => {
             },
           ]}
         />
-        <Text style={authStyles.bottomLineText}>Veya sununla devam et</Text>
+        <Text style={authStyles.bottomLineText}>{t("continueWith")}</Text>
         <View
           style={[
             authStyles.bottomLine,
@@ -263,7 +263,7 @@ const Login = () => {
               { color: IsDark ? "#9ca3af" : "#374151" },
             ]}
           >
-            Google ile Giris Yap
+            {t("withGoogle")}
           </Text>
         </TouchableOpacity>
 

@@ -121,10 +121,10 @@ const Register = () => {
                     },
                   ]}
                 >
-                  Aramiza Katil!
+                  {t("register.title")}
                 </Text>
                 <Text style={[authStyles.topSmallText, { color: "#9ca3af" }]}>
-                  Yolculuga baslamak icin kaydol.
+                  {t("register.description")}
                 </Text>
               </View>
             </View>
@@ -137,7 +137,7 @@ const Register = () => {
           type="name"
           value={name}
           onChange={setName}
-          placeholder="Adiniz Soyadiniz"
+          placeholder={t("namePlaceholder")}
         />
         <InputField
           label={t("email")}
@@ -145,10 +145,10 @@ const Register = () => {
           type="email"
           value={email}
           onChange={setEmail}
-          placeholder={t("namePlaceholder")}
+          placeholder={t("emailPlaceholder")}
         />
         <InputField
-          label="Sifre"
+          label={t("password")}
           icon={Lock}
           type="password"
           value={password}
@@ -178,7 +178,7 @@ const Register = () => {
               color: IsDark ? "#D1FAE5" : "#047857",
             }}
           >
-            1M+ kisi zinciri kirmiyor!
+            {t("register.notification")}
           </Text>
         </View>
 
@@ -187,7 +187,7 @@ const Register = () => {
           disabled={!name || !email || !password || loading}
           icon={Rocket}
         >
-          Hesap Olustur
+          {t("register.signUp")}
         </Button>
 
         <View style={authStyles.bottomContainer}>
@@ -199,7 +199,7 @@ const Register = () => {
               },
             ]}
           />
-          <Text style={authStyles.bottomLineText}>Veya sununla devam et</Text>
+          <Text style={authStyles.bottomLineText}>{t("continueWith")}</Text>
           <View
             style={[
               authStyles.bottomLine,
@@ -230,7 +230,7 @@ const Register = () => {
                 { color: IsDark ? "#9ca3af" : "#374151" },
               ]}
             >
-              Google ile Giris Yap
+              {t("withGoogle")}
             </Text>
           </TouchableOpacity>
 
@@ -253,7 +253,7 @@ const Register = () => {
                 { color: IsDark ? "#9ca3af" : "#374151" },
               ]}
             >
-              Apple ile Giris Yap
+              {t("withApple")}
             </Text>
           </TouchableOpacity>
         </View>

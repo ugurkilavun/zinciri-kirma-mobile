@@ -24,8 +24,8 @@ const Index = () => {
           STORAGE_KEYS.AUTH.FIRST_LAUNCH,
         );
 
+        // First Launch
         if (firstLaunch === null) {
-          // First Launch
           await storageService.set<boolean>(
             STORAGE_KEYS.AUTH.FIRST_LAUNCH,
             false,
