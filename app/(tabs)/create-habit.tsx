@@ -1,8 +1,7 @@
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
-import React, { useMemo, useState } from "react";
+import React, { useState, useContext } from "react";
 import {
-  Alert,
   ScrollView,
   StyleSheet,
   Switch,
@@ -14,8 +13,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Button from "@/components/Button";
-import apiClient from "@/src/services/api/apiClient";
-import { getAuthConfig } from "@/src/services/api/authHeaders";
+import { useHabits } from "@/src/contexts/HabitContext";
+
+// src/services
+import { STORAGE_KEYS, storageService } from "@/src/services/storage/";
+import ThemeProvider, { ThemeContext } from "@/src/contexts/ThemeContext";
 
 const emojiOptions = ["🏋️", "📚", "🧠", "💧", "🧘", "🎯", "🏃", "✍️"];
 const colorOptions = [
@@ -27,85 +29,43 @@ const colorOptions = [
   "#3B82F6",
 ];
 
-type FrequencyOption = "daily" | "weekly" | "custom";
+const logoutt = async () => {
+  await storageService.remove(STORAGE_KEYS.AUTH.ACCESS_TOKEN);
+  await storageService.remove(STORAGE_KEYS.AUTH.REFRESH_TOKEN);
+  router.replace("/(auth)/welcome");
+};
 
 export default function CreateHabitScreen() {
+  const { theme, toggleTheme } = useContext(ThemeContext);
+
+  const { addHabit } = useHabits();
+
+  const test = () => {
+    theme === "light" && toggleTheme("dark");
+    theme === "dark" && toggleTheme("light");
+  };
+
   const [title, setTitle] = useState("");
   const [emoji, setEmoji] = useState("🎯");
   const [color, setColor] = useState("#22C55E");
-  const [frequency, setFrequency] = useState<"daily" | "weekly" | "custom">("daily");
-  const [goal, setGoal] = useState("1");
+  const [frequency, setFrequency] = useState<"daily" | "weekly" | "custom">(
+    "daily",
+  );
   const [reminderEnabled, setReminderEnabled] = useState(true);
-  const [loading, setLoading] = useState(false);
 
-  const frequencyHint = useMemo(() => {
-    if (frequency === "daily") return "Her gun kac kez / birim yapmak istiyorsun?";
-    if (frequency === "weekly") return "Haftada kac kez yapmak istiyorsun?";
-    if (frequency === "custom") return "Hedef sayisi nedir?";
-    return "Hedef sayisi nedir?";
-  }, [frequency]);
+  const handleSave = () => {
+    if (!title.trim()) return;
 
-  const backendFrequency = useMemo(() => {
-    if (frequency === "daily") return "daily";
-    if (frequency === "weekly") return "weekly";
-    if (frequency === "custom") return "custom";
-    return "daily";
-  }, [frequency]);
+    addHabit({
+      title: title.trim(),
+      emoji,
+      color,
+      frequency,
+      reminderEnabled,
+      goal: frequency === "daily" ? 1 : 7,
+    });
 
-  const parsedGoal = useMemo(() => {
-    const value = Number(goal);
-    if (Number.isNaN(value) || value < 1) return 1;
-    return Math.floor(value);
-  }, [goal]);
-
-  const handleSave = async () => {
-    if (!title.trim()) {
-      console.log("frequency:", frequency, "goal:", goal);
-      Alert.alert("Uyari", "Lutfen bir aliskanlik adi gir.");
-      return;
-    }
-
-    if (!goal.trim() || Number(goal) < 1) {
-      Alert.alert("Uyari", "Lutfen gecerli bir hedef sayisi gir.");
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const authConfig = await getAuthConfig();
-
-      await apiClient.post(
-        "/v1/habits",
-        {
-          title: title.trim(),
-          emoji,
-          color,
-          frequency: backendFrequency.toLowerCase().trim(),
-          reminderEnabled,
-          goal: parsedGoal,
-        },
-        authConfig,
-      );
-
-      Alert.alert("Basarili", "Aliskanlik olusturuldu.", [
-        {
-          text: "OK",
-          onPress: () => router.back(),
-        },
-      ]);
-    } catch (error: any) {
-      console.log("Create habit error:", error?.response?.data || error);
-
-      const message = error?.response?.data?.message;
-
-      Alert.alert(
-        "Hata",
-        Array.isArray(message) ? message.join("\n") : message || "Aliskanlik olusturulamadi.",
-      );
-    } finally {
-      setLoading(false);
-    }
+    router.back();
   };
 
   return (
@@ -123,7 +83,7 @@ export default function CreateHabitScreen() {
 
         <Text style={styles.title}>Yeni Aliskanlik</Text>
         <Text style={styles.subtitle}>
-          Gunluk, haftalik veya özel bir hedef olustur
+          Kendi hedefini olustur ve serini baslat
         </Text>
 
         <View style={styles.card}>
@@ -131,7 +91,7 @@ export default function CreateHabitScreen() {
           <TextInput
             value={title}
             onChangeText={setTitle}
-            placeholder="Orn. Kitap oku"
+            placeholder="Orn. 20 dakika kitap oku"
             style={styles.input}
             placeholderTextColor="#94A3B8"
           />
@@ -166,17 +126,15 @@ export default function CreateHabitScreen() {
 
           <Text style={styles.label}>Siklik</Text>
           <View style={styles.segmentRow}>
-            {[
-              { key: "daily", label: "Gunluk" },
-              { key: "weekly", label: "Haftalik" },
-              { key: "custom", label: "custom" },
-            ].map((item) => {
-              const active = frequency === item.key;
+            {["daily", "weekly", "custom"].map((item) => {
+              const active = frequency === item;
               return (
                 <TouchableOpacity
-                  key={item.key}
+                  key={item}
                   style={[styles.segmentBtn, active && styles.segmentBtnActive]}
-                  onPress={() => setFrequency(item.key as FrequencyOption)}
+                  onPress={() =>
+                    setFrequency(item as "daily" | "weekly" | "custom")
+                  }
                 >
                   <Text
                     style={[
@@ -184,23 +142,16 @@ export default function CreateHabitScreen() {
                       active && styles.segmentTextActive,
                     ]}
                   >
-                    {item.label}
+                    {item === "daily"
+                      ? "Gunluk"
+                      : item === "weekly"
+                        ? "Haftalik"
+                        : "Ozel"}
                   </Text>
                 </TouchableOpacity>
               );
             })}
           </View>
-
-          <Text style={styles.label}>Hedef sayisi</Text>
-          <Text style={styles.helperText}>{frequencyHint}</Text>
-          <TextInput
-            value={goal}
-            onChangeText={(text) => setGoal(text.replace(/[^0-9]/g, ""))}
-            placeholder="1"
-            keyboardType="numeric"
-            style={styles.input}
-            placeholderTextColor="#94A3B8"
-          />
 
           <View style={styles.switchRow}>
             <Text style={styles.label}>Hatirlatici</Text>
@@ -212,10 +163,35 @@ export default function CreateHabitScreen() {
         </View>
 
         <View style={{ marginTop: 24 }}>
-          <Button onPress={handleSave} disabled={!title.trim() || loading}>
-            {loading ? "Kaydediliyor..." : "Kaydet"}
-          </Button>
+          <Button onPress={handleSave}>Kaydet</Button>
         </View>
+
+        {/* Delete */}
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#eb4444",
+            marginVertical: 15,
+            padding: 15,
+            alignItems: "center",
+            borderRadius: 10,
+          }}
+          onPress={() => logoutt()}
+        >
+          <Text>Çıkış Yap</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: "#514eee",
+            // marginVertical: 15,
+            padding: 15,
+            alignItems: "center",
+            borderRadius: 10,
+          }}
+          onPress={() => test()}
+        >
+          <Text>{`Tema Seç: ${theme}`}</Text>
+        </TouchableOpacity>
+        {/* Delete */}
       </ScrollView>
     </SafeAreaView>
   );
@@ -248,12 +224,6 @@ const styles = StyleSheet.create({
     color: "#334155",
     marginBottom: 10,
     marginTop: 12,
-  },
-  helperText: {
-    fontSize: 13,
-    color: "#64748B",
-    marginBottom: 10,
-    marginTop: -2,
   },
   input: {
     height: 54,

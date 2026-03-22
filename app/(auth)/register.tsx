@@ -24,12 +24,15 @@ import { Colors } from "@/constants/themes";
 // src/services
 import { authApi } from "@/src/services/api/endpoints/auth";
 import { STORAGE_KEYS, storageService } from "@/src/services/storage/";
-// !TEST
-import { IsDark } from "@/constants/tempThemeSelector";
+// Hooks
+import { useTheme } from "@/hooks/useTheme";
 
 const Register = () => {
   // Languages
   const { t } = useTranslation("auth");
+
+  // Theme
+  const { theme } = useTheme();
 
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
@@ -81,9 +84,10 @@ const Register = () => {
       style={[
         authStyles.safeAreaView,
         {
-          backgroundColor: IsDark
-            ? Colors.dark.background
-            : Colors.light.background,
+          backgroundColor:
+            theme === "light"
+              ? Colors.light.background
+              : Colors.dark.background,
         },
       ]}
     >
@@ -107,7 +111,10 @@ const Register = () => {
               <View
                 style={[
                   authStyles.top,
-                  { backgroundColor: IsDark ? "#10b9811a" : "#f1ffe7" },
+                  {
+                    backgroundColor:
+                      theme === "light" ? "#f1ffe7" : "#10b9811a",
+                  },
                 ]}
               >
                 <UserPlus size={32} color="#5EC72D" strokeWidth={2} />
@@ -117,7 +124,7 @@ const Register = () => {
                   style={[
                     authStyles.topStrongText,
                     {
-                      color: IsDark ? "#ffffff" : "#111827",
+                      color: theme === "light" ? "#111827" : "#ffffff",
                     },
                   ]}
                 >
@@ -162,20 +169,23 @@ const Register = () => {
             flexDirection: "row",
             gap: 12,
             padding: 16,
-            backgroundColor: IsDark ? "#1F2A37" : "#ecfdf5",
+            backgroundColor: theme === "light" ? "#ecfdf5" : "#1F2A37",
             borderRadius: 16,
             marginTop: 16,
             marginBottom: 20,
             borderWidth: 1,
-            borderColor: IsDark ? "#374151" : "#d1fae5",
+            borderColor: theme === "light" ? "#d1fae5" : "#374151",
           }}
         >
-          <Sparkles size={20} color={IsDark ? "#34D399" : "#10b981"} />
+          <Sparkles
+            size={20}
+            color={theme === "light" ? "#10b981" : "#34D399"}
+          />
           <Text
             style={{
               fontSize: 14,
               fontWeight: "700",
-              color: IsDark ? "#D1FAE5" : "#047857",
+              color: theme === "light" ? "#047857" : "#D1FAE5",
             }}
           >
             {t("register.notification")}
@@ -195,7 +205,7 @@ const Register = () => {
             style={[
               authStyles.bottomLine,
               {
-                backgroundColor: IsDark ? "#1f2937" : "#f3f4f6",
+                backgroundColor: theme === "light" ? "#f3f4f6" : "#1f2937",
               },
             ]}
           />
@@ -204,7 +214,7 @@ const Register = () => {
             style={[
               authStyles.bottomLine,
               {
-                backgroundColor: IsDark ? "#1f2937" : "#f3f4f6",
+                backgroundColor: theme === "light" ? "#f3f4f6" : "#1f2937",
               },
             ]}
           />
@@ -216,18 +226,18 @@ const Register = () => {
             activeOpacity={0.8}
             style={[
               authStyles.bottomButton,
-              { borderColor: IsDark ? "#374151" : "#e5e7eb" },
+              { borderColor: theme === "light" ? "#e5e7eb" : "#374151" },
             ]}
           >
             <AntDesign
               name="google"
               size={24}
-              color={IsDark ? "#9ca3af" : "#374151"}
+              color={theme === "light" ? "#374151" : "#9ca3af"}
             />
             <Text
               style={[
                 authStyles.bottomButtonText,
-                { color: IsDark ? "#9ca3af" : "#374151" },
+                { color: theme === "light" ? "#374151" : "#9ca3af" },
               ]}
             >
               {t("withGoogle")}
@@ -239,18 +249,18 @@ const Register = () => {
             activeOpacity={0.8}
             style={[
               authStyles.bottomButton,
-              { borderColor: IsDark ? "#374151" : "#e5e7eb" },
+              { borderColor: theme === "light" ? "#e5e7eb" : "#374151" },
             ]}
           >
             <AntDesign
               name="apple"
               size={24}
-              color={IsDark ? "#9ca3af" : "#374151"}
+              color={theme === "light" ? "#374151" : "#9ca3af"}
             />
             <Text
               style={[
                 authStyles.bottomButtonText,
-                { color: IsDark ? "#9ca3af" : "#374151" },
+                { color: theme === "light" ? "#374151" : "#9ca3af" },
               ]}
             >
               {t("withApple")}

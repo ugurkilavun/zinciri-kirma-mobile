@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { Eye, EyeOff } from "lucide-react-native";
-// !TEST
-import { IsDark } from "@/constants/tempThemeSelector";
+// Colors
 import { Colors } from "@/constants/themes";
+// Hooks
+import { useTheme } from "@/hooks/useTheme";
 
 const InputField = ({
   label,
@@ -14,17 +15,20 @@ const InputField = ({
   placeholder,
   showPasswordToggle,
 }: any) => {
+  // Theme
+  const { theme } = useTheme();
+
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
 
   const getBorderColor = () => {
     if (isFocused) return Colors.light.mainColorGreen;
-    return IsDark ? "#374151" : "#e5e7eb";
+    return theme === "light" ? "#e5e7eb" : "#374151";
   };
 
   const getBackgroundColor = () => {
-    if (isFocused) return IsDark ? "#111827" : "#ffffff";
-    return IsDark ? "#1f2937" : "#f9fafb";
+    if (isFocused) return theme === "light" ? "#ffffff" : "#111827";
+    return theme === "light" ? "#f9fafb" : "#1f2937";
   };
 
   const targetRef = useRef(null);
@@ -47,7 +51,7 @@ const InputField = ({
         style={{
           fontSize: 12,
           fontWeight: "900",
-          color: IsDark ? "#9ca3af" : "#9ca3af",
+          color: theme === "light" ? "#9ca3af" : "#9ca3af",
           marginBottom: 8,
           textTransform: "uppercase",
           letterSpacing: 1,
@@ -87,7 +91,7 @@ const InputField = ({
             paddingRight: showPasswordToggle ? 48 : 16,
             fontSize: 18,
             fontWeight: "700",
-            color: IsDark ? "#ffffff" : "#111827",
+            color: theme === "light" ? "#111827" : "#ffffff",
           }}
         />
         {showPasswordToggle && (

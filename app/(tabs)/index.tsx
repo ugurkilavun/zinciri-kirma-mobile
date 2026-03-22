@@ -21,7 +21,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import { getAuthConfig } from "@/src/services/api/authHeaders";
 import { IsDark } from "@/constants/tempThemeSelector";
 import { Colors } from "@/constants/themes";
-import { useHabits } from "@/src/context/HabitContext";
+import { useHabits } from "@/src/contexts/HabitContext";
 import apiClient from "@/src/services/api/apiClient";
 
 const { width } = Dimensions.get("window");
@@ -296,7 +296,7 @@ export default function HomeScreen() {
       localHabits.filter((h) => h.completed).length * 50 + 1200,
     hearts: profile?.recoveryRemaining ?? 5,
   };
-  
+
   const weekData = useMemo(() => {
   const start = getStartOfWeek(new Date());
   const today = todayKey();

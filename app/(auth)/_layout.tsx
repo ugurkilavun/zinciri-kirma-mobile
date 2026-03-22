@@ -2,12 +2,15 @@ import { Colors } from "@/constants/themes";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { Tabs } from "expo-router";
 import React from "react";
-// !TEST
-import { IsDark } from "@/constants/tempThemeSelector";
+// Hooks
+import { useTheme } from "@/hooks/useTheme";
 
 export default function AuthLayout() {
   const colorScheme = useColorScheme();
-  // 111827
+
+  // Theme
+  const { theme } = useTheme();
+
   return (
     <Tabs
       screenOptions={{
@@ -15,9 +18,10 @@ export default function AuthLayout() {
         headerShown: false,
         tabBarStyle: { display: "none" },
         sceneStyle: {
-          backgroundColor: IsDark
-            ? Colors.dark.background
-            : Colors.light.background,
+          backgroundColor:
+            theme === "light"
+              ? Colors.light.background
+              : Colors.dark.background,
         },
       }}
     >

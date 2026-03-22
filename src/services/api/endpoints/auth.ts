@@ -7,6 +7,9 @@ export const authApi = {
   googleLogin: (idToken: string) =>
     apiClient.post("/v1/auth/google/mobile", { idToken }),
 
+  register: (name: string, email: string, password: string) =>
+    apiClient.post("/v1/auth/register", { name, email, password }),
+
   appleLogin: (payload: {
     idToken: string;
     email?: string;

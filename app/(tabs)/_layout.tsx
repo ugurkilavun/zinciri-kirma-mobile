@@ -8,6 +8,8 @@ import Octicons from "@expo/vector-icons/Octicons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 // Colors
 import { Colors } from "@/constants/themes";
+// Hooks
+import { useTheme } from "@/hooks/useTheme";
 
 const CreateHabitButton = ({ onPress }: { onPress: any }) => {
   return (
@@ -25,6 +27,9 @@ const CreateHabitButton = ({ onPress }: { onPress: any }) => {
 
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
+
+  // Theme
+  const { theme } = useTheme();
 
   return (
     <Tabs
@@ -83,7 +88,7 @@ export default function TabLayout() {
 
       <Tabs.Screen
         name="achievements"
-        options={{href:null,}}
+        options={{ href: null }}
         // options={{
         //   title: "Rozetler",
         //   tabBarIcon: ({ color, focused }) => (

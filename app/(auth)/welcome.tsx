@@ -10,25 +10,29 @@ import { useTranslation } from "react-i18next";
 import { styles } from "@/assets/stylesheets/welcomeStyle";
 // Constants
 import { Colors } from "@/constants/themes";
-// !TEST
-import { IsDark } from "@/constants/tempThemeSelector";
+// Hooks
+import { useTheme } from "@/hooks/useTheme";
 
 const Welcome = () => {
   // Languages
   const { t } = useTranslation("welcome");
+
+  // Theme
+  const { theme } = useTheme();
 
   return (
     <SafeAreaView
       style={[
         styles.safeAreaView,
         {
-          backgroundColor: IsDark
-            ? Colors.dark.background
-            : Colors.light.background,
+          backgroundColor:
+            theme === "light"
+              ? Colors.light.background
+              : Colors.dark.background,
         },
       ]}
     >
-      <StatusBar style={IsDark ? "light" : "dark"} />
+      <StatusBar style={theme === "light" ? "dark" : "light"} />
       <View style={styles.bodyContainer}>
         <View
           style={[
@@ -36,14 +40,22 @@ const Welcome = () => {
             { backgroundColor: Colors.light.mainColorGreen },
           ]}
         >
-          <Link size={80} color="#ffffff" fill={Colors.light.mainColorGreen} />
+          <Link
+            size={80}
+            color={
+              theme === "light"
+                ? Colors.light.background
+                : Colors.dark.background
+            }
+            fill={Colors.light.mainColorGreen}
+          />
           {/* <Flame size={80} color={Colors.light.mainColor2} fill={Colors.light.mainColor2} /> */}
         </View>
         <Text style={styles.bodyHeaderText}>{t("title")}</Text>
         <Text
           style={[
             styles.bodyDescText,
-            { color: IsDark ? "#9ca3af" : "#6b7280" },
+            { color: theme === "light" ? "#6b7280" : "#9ca3af" },
           ]}
         >
           {t("description")}

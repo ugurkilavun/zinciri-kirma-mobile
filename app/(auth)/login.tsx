@@ -19,8 +19,8 @@ import { Colors } from "@/constants/themes";
 // src/services
 import { authApi } from "@/src/services/api/endpoints/auth";
 import { STORAGE_KEYS, storageService } from "@/src/services/storage/";
-// ! TEST
-import { IsDark } from "@/constants/tempThemeSelector";
+// Hooks
+import { useTheme } from "@/hooks/useTheme";
 
 const GOOGLE_WEB_CLIENT_ID =
   "118200182956-hp33c7n062acpkgmj05cic1p7hlcfphf.apps.googleusercontent.com";
@@ -31,6 +31,9 @@ const GOOGLE_IOS_CLIENT_ID =
 const Login = () => {
   // Languages
   const { t } = useTranslation("auth");
+
+  // Theme
+  const { theme } = useTheme();
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -155,9 +158,10 @@ const Login = () => {
       style={[
         authStyles.safeAreaView,
         {
-          backgroundColor: IsDark
-            ? Colors.dark.background
-            : Colors.light.background,
+          backgroundColor:
+            theme === "light"
+              ? Colors.light.background
+              : Colors.dark.background,
         },
       ]}
     >
@@ -171,7 +175,9 @@ const Login = () => {
             <View
               style={[
                 authStyles.top,
-                { backgroundColor: IsDark ? "#10b9811a" : "#f1ffe7" },
+                {
+                  backgroundColor: theme === "light" ? "#f1ffe7" : "#10b9811a",
+                },
               ]}
             >
               <LogIn size={32} color={Colors.light.mainColorGreen} />
@@ -180,7 +186,7 @@ const Login = () => {
               <Text
                 style={[
                   authStyles.topStrongText,
-                  { color: IsDark ? "#ffffff" : "#111827" },
+                  { color: theme === "light" ? "#111827" : "#ffffff" },
                 ]}
               >
                 {t("login.title")}
@@ -227,7 +233,7 @@ const Login = () => {
           style={[
             authStyles.bottomLine,
             {
-              backgroundColor: IsDark ? "#1f2937" : "#f3f4f6",
+              backgroundColor: theme === "light" ? "#f3f4f6" : "#1f2937",
             },
           ]}
         />
@@ -236,7 +242,7 @@ const Login = () => {
           style={[
             authStyles.bottomLine,
             {
-              backgroundColor: IsDark ? "#1f2937" : "#f3f4f6",
+              backgroundColor: theme === "light" ? "#f3f4f6" : "#1f2937",
             },
           ]}
         />
@@ -248,19 +254,19 @@ const Login = () => {
           activeOpacity={0.8}
           style={[
             authStyles.bottomButton,
-            { borderColor: IsDark ? "#374151" : "#e5e7eb" },
+            { borderColor: theme === "light" ? "#e5e7eb" : "#374151" },
           ]}
           disabled={loading}
         >
           <AntDesign
             name="google"
             size={24}
-            color={IsDark ? "#9ca3af" : "#374151"}
+            color={theme === "light" ? "#374151" : "#9ca3af"}
           />
           <Text
             style={[
               authStyles.bottomButtonText,
-              { color: IsDark ? "#9ca3af" : "#374151" },
+              { color: theme === "light" ? "#374151" : "#9ca3af" },
             ]}
           >
             {t("withGoogle")}
@@ -273,14 +279,14 @@ const Login = () => {
             activeOpacity={0.8}
             style={[
               authStyles.bottomButton,
-              { borderColor: IsDark ? "#374151" : "#e5e7eb" },
+              { borderColor: theme === "light" ? "#e5e7eb" : "#374151" },
             ]}
             disabled={loading}
           >
             <Text
               style={[
                 authStyles.bottomButtonText,
-                { color: IsDark ? "#9ca3af" : "#374151" },
+                { color: theme === "light" ? "#374151" : "#9ca3af" },
               ]}
             >
               {t("withApple")}

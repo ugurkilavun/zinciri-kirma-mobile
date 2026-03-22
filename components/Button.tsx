@@ -1,8 +1,9 @@
 import React from "react";
-import { TouchableOpacity, Text, ActivityIndicator } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
+// Colors
 import { Colors } from "@/constants/themes";
-// !TEST
-import { IsDark } from "@/constants/tempThemeSelector";
+// Hooks
+import { useTheme } from "@/hooks/useTheme";
 
 const Button = ({
   children,
@@ -11,6 +12,9 @@ const Button = ({
   icon: Icon,
   disabled,
 }: any) => {
+  // Theme
+  const { theme } = useTheme();
+
   const getBackgroundColor = () => {
     if (disabled) return variant === "primary" ? "#d7fabd" : "#e5e7eb";
     return variant === "primary" ? Colors.light.mainColorGreen : "transparent";
@@ -24,12 +28,12 @@ const Button = ({
   const getBorderColor = () => {
     if (disabled) return variant === "primary" ? "#b9e995" : "#d1d5db";
     return variant === "primary"
-      ? IsDark
-        ? Colors.dark.borderBottomColorGreen
-        : Colors.light.borderBottomColorGreen
-      : IsDark
-        ? "#374151"
-        : "#e5e7eb";
+      ? theme === "light"
+        ? Colors.light.borderBottomColorGreen
+        : Colors.dark.borderBottomColorGreen
+      : theme === "light"
+        ? "#e5e7eb"
+        : "#374151";
   };
 
   return (

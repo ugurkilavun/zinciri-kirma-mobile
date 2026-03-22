@@ -6,8 +6,13 @@ import { IsDark } from "@/constants/tempThemeSelector";
 import { Colors } from "@/constants/themes";
 // src/services
 import { STORAGE_KEYS, storageService } from "@/src/services/storage/";
+// Hooks
+import { useTheme } from "@/hooks/useTheme";
 
 const Index = () => {
+  // Theme
+  const { theme } = useTheme();
+
   const [isReady, setIsReady] = useState<boolean>(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
@@ -19,7 +24,7 @@ const Index = () => {
       // storageService.clear();
 
       try {
-        await storageService.clear();
+        // await storageService.clear();
         const firstLaunch = await storageService.get<boolean>(
           STORAGE_KEYS.AUTH.FIRST_LAUNCH,
         );
@@ -87,9 +92,10 @@ const Index = () => {
       <SafeAreaView
         style={{
           flex: 1,
-          backgroundColor: IsDark
-            ? Colors.dark.background
-            : Colors.light.background,
+          backgroundColor:
+            theme === "light"
+              ? Colors.light.background
+              : Colors.dark.background,
         }}
       >
         <View
